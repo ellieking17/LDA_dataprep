@@ -3,6 +3,7 @@ import pandas as pd
 import re #regular expression
 import click
 import argparse
+import os
 
 """
 This module/script takes the tagged url output from train_LDA with 5 topics, splits it into 5 groups and merges each group with original data to produce separate url, text.csvs ready to run LDA on
@@ -14,6 +15,12 @@ __author__ = "Ellie King"
 __copyright__ = "Government Digital Service, 10/07/2017"
 
 parser = argparse.ArgumentParser(description=__doc__)
+
+
+parser.add_argument(
+    '--out_path', dest='out_path', metavar='OUTPUT FOLDER', default=None,
+    help='export split dfs to csv'
+)
 
 parser.add_argument(
     '--preLDA_fpath', dest='prelda_filename', metavar='FILENAME', default=None,
@@ -77,22 +84,12 @@ def tidy_to_urltext(urltext_by_topic):
 
     return(tidy_urltext_by_topic)
 
-def write_to_5_csvs(df_first, df_second, df_third,  df_fourth, df_fifth):
-    df_first.to_csv(
-        'enviro_experiments/DATA_environment_2017/dendro/first_top_PM.csv', index = False
+def write_to_csvs(tidy_urltext_by_topic, out_path):
+    for df in urltext_by_topic:
+    df.to_csv(
+        os.path.join(out_path,r'df.csv'), index = False
         )
-    df_second.to_csv(
-        'enviro_experiments/DATA_environment_2017/dendro/second_top_PM.csv', index = False
-        )
-    df_third.to_csv(
-        'enviro_experiments/DATA_environment_2017/dendro/third_top_PM.csv', index = False
-        )
-    df_fourth.to_csv(
-        'enviro_experiments/DATA_environment_2017/dendro/fourth_top_PM.csv', index = False)
-    df_fifth.to_csv(
-        'enviro_experiments/DATA_environment_2017/dendro/fifth_top_PM.csv', index = False)
 
-    return(df_tag5, df_preLDA)
 
 if __name__ == '__main__':
     args = parser.parse_args()

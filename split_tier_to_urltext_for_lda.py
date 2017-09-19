@@ -104,39 +104,21 @@ if __name__ == '__main__':
     print(df_preLDA.head(10))
 
     print("Cleaning tags")
-    df_tag5_clean = clean_tagged_urls(df_tag5)
+    df_tag_clean = clean_tagged_urls(df_tag)
 
     print("Splitting by topic")
-    df_first_topic, df_second_topic, df_third_topic,  df_fourth_topic, df_fifth_topic = split_urls_by_topic(df_tag5_clean)
+    urls_by_topic_filtered = split_urls_by_topic(df_tag_clean)
 
     print("Merging to text file")
-    df_first, df_second, df_third,  df_fourth, df_fifth = get_text_by_merging(df_first_topic, 
-        df_second_topic, 
-        df_third_topic,  
-        df_fourth_topic, 
-        df_fifth_topic, 
-        df_preLDA
-        )
+    urltext_by_topic = get_text_by_merging(urls_by_topic_filtered)
 
-    print(df_fifth.head(10))
+    print(urltext_by_topic[0].head(10))
 
     print("Tidying up")
-    df_first_tidy, df_second_tidy, df_third_tidy, df_fourth_tidy, df_fifth_tidy = tidy_to_urltext(
-        df_first, 
-        df_second, 
-        df_third, 
-        df_fourth, 
-        df_fifth
-        )
+    tidy_urltext_by_topic = tidy_to_urltext(urltext_by_topic)
 
     print("Write to file")
-    write_to_5_csvs(
-        df_first_tidy, 
-        df_second_tidy, 
-        df_third_tidy,  
-        df_fourth_tidy, 
-        df_fifth_tidy
-        )
+    write_to_csvs(tidy_urltext_by_topic, out_path = args.out_path)
 
 
 

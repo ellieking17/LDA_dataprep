@@ -8,8 +8,9 @@ import os
 """
 This module/script takes the tagged url output from train_LDA with 5 topics, splits it into 5 groups and merges each group with original data to produce separate url, text.csvs ready to run LDA on
 
+
 Example usage:
-python split5topics_to_url_for_lda.py --preLDA_fpath input/test_urltext.csv --tagged_fpath input/test_tags.csv
+python split_tier_to_urltext_for_lda.py --out_path --preLDA_fpath input/test_urltext.csv --tagged_fpath input/test_tags.csv
 """  
 __author__ = "Ellie King"
 __copyright__ = "Government Digital Service, 10/07/2017"
@@ -75,25 +76,31 @@ def get_text_by_merging(urls_by_topic_filtered):
 
 
 def tidy_to_urltext(urltext_by_topic):
-     """Function to keep only the url and text columns of the documents tagged with each topic"""
-        tidy_urltext_by_topic = []
-         for df in urltext_by_topic:
+    """Function to keep only the url and text columns of the documents tagged with each topic"""
+    tidy_urltext_by_topic = []
+    for df in urltext_by_topic:
         tidy_urltext_by_topic += \
             df.drop(df_first.columns[[1, 2, 4]], axis=1)
-            df.columns = ['url', 'text'] #rename columns as they will be expected in train_LDA.py
-
     return(tidy_urltext_by_topic)
 
-def write_to_csvs(tidy_urltext_by_topic, out_path):
-    for df in urltext_by_topic:
-    df.to_csv(
+def namecols_urltext(tidy_urltext_by_topic):
+    """Function to keep only the url and text columns of the documents tagged with each topic"""
+    named_urltext_by_topic = []
+    for df in tidy_urltext_by_topic:
+        named_urltext_by_topic += \
+            df.columns = ['url', 'text'] #rename columns as they will be expected in train_LDA.py
+    return(named_urltext_by_topic)
+
+def write_to_csvs(named_urltext_by_topic, out_path):
+    for df in named_urltext_by_topic:
+        df.to_csv(
         os.path.join(out_path,r'df.csv'), index = False
         )
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
-
+    print(" out path{}".format(args.out_path))
     print("Loading input file {}".format(args.prelda_filename))
     print("Loading input file {}".format(args.taggedurls_filename))
     df_tag5, df_preLDA = read_data(
@@ -117,13 +124,9 @@ if __name__ == '__main__':
     print("Tidying up")
     tidy_urltext_by_topic = tidy_to_urltext(urltext_by_topic)
 
+    print("Naming columns")
+    named_urltext_by_topic = namecols_urltext(tidy_urltext_by_topic)
+
     print("Write to file")
-    write_to_csvs(tidy_urltext_by_topic, out_path = args.out_path)
-
-
-
-
-#untested loop to rpelace lines above
-#for topic_id in range(0, 5):
- #   df_topic_+str(topic_id + 1) = df2_tag5.loc[df2_tag5['topic_id'] == str(topic_id)#haven't tested this loop to replace the 5 lines below
+    write_to_csvs(named_urltext_by_topic, out_path = args.out_path)
 

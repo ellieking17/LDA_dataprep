@@ -43,14 +43,20 @@ def clean_tagged_urls(df_tag5):
     df2_tag5.columns = ['url', 'topic_id']
     return(df2_tag5)
 
-def split_urls_by_topic(df_tag5_clean):
-    #split dataframe into 5 separate dfs filtered on topic_id
-    df_first_topic = df_tag5_clean.loc[df_tag5_clean['topic_id'] == '0']
-    df_second_topic = df_tag5_clean.loc[df_tag5_clean['topic_id'] == '1']
-    df_third_topic = df_tag5_clean.loc[df_tag5_clean['topic_id'] == '2']
-    df_fourth_topic = df_tag5_clean.loc[df_tag5_clean['topic_id'] == '3']
-    df_fifth_topic = df_tag5_clean.loc[df_tag5_clean['topic_id'] == '4']
-    return(df_first_topic, df_second_topic, df_third_topic,  df_fourth_topic, df_fifth_topic)
+# def split_urls_by_topic(df_tag5_clean, number_topics):
+#     return (
+#         df_tag5_clean.loc[df_tag5_clean['topic_id'] == str(num)]
+#         for num in number_topics
+#         ) commented out but example of cleaner code but less easy to understand than below
+
+def split_urls_by_topic(df_tag5_clean, number_topics):
+    """Function to split datframe into n separate dfs filtered on topic_id"""
+    urls_by_topic_filtered = [] #create empty list
+    for num in number_topics:
+        urls_by_topic_filtered += \
+            df_tag5_clean.loc[df_tag5_clean['topic_id'] == str(num)]
+    return urls_by_topic_filtered
+
     
 def get_text_by_merging(df_first_topic, df_second_topic, df_third_topic,  df_fourth_topic, df_fifth_topic, df_preLDA):
     #merge on the index column to get text back from original url, text data

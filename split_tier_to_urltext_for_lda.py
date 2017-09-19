@@ -67,31 +67,15 @@ def get_text_by_merging(urls_by_topic_filtered):
     return urltext_by_topic
 
 
-def get_text_by_merging(df_first_topic, df_second_topic, df_third_topic,  df_fourth_topic, df_fifth_topic, df_preLDA):
-    #merge on the index column to get text back from original url, text data
-    df_first = pd.merge(df_first_topic, df_preLDA, left_index = True, right_index = True , indicator = True)
-    df_second = pd.merge(df_second_topic, df_preLDA, left_index = True, right_index = True , indicator = True)
-    df_third = pd.merge(df_third_topic, df_preLDA, left_index = True, right_index = True , indicator = True)
-    df_fourth = pd.merge(df_fourth_topic, df_preLDA, left_index = True, right_index = True , indicator = True)
-    df_fifth = pd.merge(df_fifth_topic, df_preLDA, left_index = True, right_index = True , indicator = True)
-    return(df_first, df_second, df_third,  df_fourth, df_fifth)
+def tidy_to_urltext(urltext_by_topic):
+     """Function to keep only the url and text columns of the documents tagged with each topic"""
+        tidy_urltext_by_topic = []
+         for df in urltext_by_topic:
+        tidy_urltext_by_topic += \
+            df.drop(df_first.columns[[1, 2, 4]], axis=1)
+            df.columns = ['url', 'text'] #rename columns as they will be expected in train_LDA.py
 
-def tidy_to_urltext(df_first, df_second, df_third, df_fourth, df_fifth):
-
-    #keep only the url and text columns of the documents tagged with each topic
-    df_first_tidy =  df_first.drop(df_first.columns[[1, 2, 4]], axis=1)
-    df_second_tidy =  df_second.drop(df_second.columns[[1, 2, 4]], axis=1)
-    df_third_tidy =  df_third.drop(df_third.columns[[1, 2, 4]], axis=1)
-    df_fourth_tidy =  df_fourth.drop(df_fourth.columns[[1, 2, 4]], axis=1)
-    df_fifth_tidy =  df_fifth.drop(df_fifth.columns[[1, 2, 4]], axis=1)
-
-    #rename columns as they will be expected in train_LDA.py
-    df_first_tidy.columns = ['url', 'text']
-    df_second_tidy.columns = ['url', 'text']
-    df_third_tidy.columns = ['url', 'text']
-    df_fourth_tidy.columns = ['url', 'text']
-    df_fifth_tidy.columns = ['url', 'text']
-    return(df_first_tidy, df_second_tidy, df_third_tidy,  df_fourth_tidy, df_fifth_tidy)
+    return(tidy_urltext_by_topic)
 
 def write_to_5_csvs(df_first, df_second, df_third,  df_fourth, df_fifth):
     df_first.to_csv(

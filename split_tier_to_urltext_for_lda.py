@@ -58,6 +58,15 @@ def split_urls_by_topic(df_tag5_clean, number_topics):
     return urls_by_topic_filtered
 
     
+def get_text_by_merging(urls_by_topic_filtered):
+    #merge on the index column to get text back from original url, text data
+    urltext_by_topic = []
+    for df in urls_by_topic_filtered:
+        urltext_by_topic += \
+            pd.merge(df, df_preLDA, left_index = True, right_index = True , indicator = True)
+    return urltext_by_topic
+
+
 def get_text_by_merging(df_first_topic, df_second_topic, df_third_topic,  df_fourth_topic, df_fifth_topic, df_preLDA):
     #merge on the index column to get text back from original url, text data
     df_first = pd.merge(df_first_topic, df_preLDA, left_index = True, right_index = True , indicator = True)

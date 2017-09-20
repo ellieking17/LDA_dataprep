@@ -64,13 +64,7 @@ def split_urls_by_topic(df_tag_clean, num_topics):
     """Function to split datframe into n separate dfs filtered on topic_id"""
     urls_by_topic_filtered = [] #create empty list
     for num in range(1, num_topics+1):
-        #print(num)
-        #print(df_tag_clean[df_tag_clean.topic_id == str(num)]) # [560 rows x 2 columns]
-
-        #urls_by_topic_filtered += \
-         #   df_tag_clean[df_tag_clean.topic_id == str(num)]
         urls_by_topic_filtered.append(df_tag_clean[df_tag_clean.topic_id == str(num)])
-        #print(len(urls_by_topic_filtered))
     return urls_by_topic_filtered
 
     
@@ -78,8 +72,6 @@ def get_text_by_merging(urls_by_topic_filtered):
     #merge on the index column to get text back from original url, text data
     urltext_by_topic = []
     for df in urls_by_topic_filtered:
-        # urltext_by_topic += \
-        #     pd.merge(df, df_preLDA, left_index = True, right_index = True , indicator = True)
         urltext_by_topic.append(pd.merge(df, df_preLDA, left_index = True, right_index = True , indicator = True))
     return urltext_by_topic
 
@@ -88,9 +80,7 @@ def tidy_to_urltext(urltext_by_topic):
     """Function to keep only the url and text columns of the documents tagged with each topic"""
     tidy_urltext_by_topic = []
     for df in urltext_by_topic:
-        # tidy_urltext_by_topic += \
-        #     df.drop(df_first.columns[[1, 2, 4]], axis=1)
-        tidy_urltext_by_topic.append(df.drop(df_first.columns[[1, 2, 4]], axis=1))
+        tidy_urltext_by_topic.append(df.drop(df.columns[[1, 2, 4]], axis=1))
     return(tidy_urltext_by_topic)
 
 def namecols_urltext(tidy_urltext_by_topic):
@@ -123,9 +113,6 @@ if __name__ == '__main__':
 
     print(df_tag_clean.head(10))
     
-    #print("test")
-    #test = df_tag_clean[df_tag_clean.topic_id == '1']
-    #print(test.head(10))
 
     print("Splitting by topic")
     urls_by_topic_filtered = split_urls_by_topic(df_tag_clean, num_topics = args.num_topics)

@@ -5,11 +5,11 @@ import argparse
 import os
 
 """
-This module/script takes the tagged url output from train_LDA with 5 topics, splits it into 5 groups and merges each group with original data to produce separate url, text.csvs ready to run LDA on
+This module/script takes the tagged url output from train_LDA with n topics, splits it into n groups and merges each group with original data to produce separate url, text.csvs ready to run further LDA on
 
 
 Example usage:
-python split_tier_to_urltext_for_lda.py --out_path --preLDA_fpath input/test_urltext.csv --tagged_fpath input/test_tags.csv
+python split_tier_to_urltext_for_lda.py --out_path ../DATA/output --preLDA_fpath input/test_urltext.csv --tagged_fpath input/test_tags.csv
 """  
 __author__ = "Ellie King"
 __copyright__ = "Government Digital Service, 10/07/2017"
@@ -54,11 +54,6 @@ def clean_tagged_urls(df_tag):
     df2_tag.columns = ['url', 'topic_id']
     return(df2_tag)
 
-# def split_urls_by_topic(df_tag_clean, num_topics):
-#     return (
-#         df_tag_clean.loc[df_tag_clean['topic_id'] == str(num)]
-#         for num in num_topics
-#         ) commented out but example of cleaner code but less easy to understand than below
 
 def split_urls_by_topic(df_tag_clean, num_topics):
     """Function to split datframe into n separate dfs filtered on topic_id"""
@@ -87,14 +82,11 @@ def namecols_urltext(tidy_urltext_by_topic):
     """Function to keep only the url and text columns of the documents tagged with each topic"""
     for df in tidy_urltext_by_topic:
             df.columns = ['url', 'text'] #rename columns as they will be expected in train_LDA.py
-            print(df.shape)
     return(tidy_urltext_by_topic)
 
 def write_to_csvs(named_urltext_by_topic, out_path):
     for index, df in enumerate(named_urltext_by_topic):
-        print(str(index))
         fname = "{}{}{}".format("topic", str(index), ".csv")
-        print(fname)
         df.to_csv(
         os.path.join(out_path, fname), index = False
         )
@@ -115,7 +107,6 @@ if __name__ == '__main__':
     print("Cleaning tags")
     df_tag_clean = clean_tagged_urls(df_tag)
 
-    print(df_tag_clean.head(10))
     
 
     print("Splitting by topic")
@@ -124,7 +115,6 @@ if __name__ == '__main__':
     print("Merging to text file")
     urltext_by_topic = get_text_by_merging(urls_by_topic_filtered)
 
-    print(urltext_by_topic[0].head(10))
 
     print("Tidying up")
     tidy_urltext_by_topic = tidy_to_urltext(urltext_by_topic)

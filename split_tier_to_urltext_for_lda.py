@@ -17,7 +17,7 @@ __copyright__ = "Government Digital Service, 10/07/2017"
 parser = argparse.ArgumentParser(description=__doc__)
 
 parser.add_argument(
-    '--num_topics', dest='num_topics', metavar='N', default=None,
+    '--num_topics', dest='num_topics', metavar='N', type = int, default=None,
     help='number of topics used in LDA'
 )
 
@@ -54,16 +54,19 @@ def clean_tagged_urls(df_tag):
     df2_tag.columns = ['url', 'topic_id']
     return(df2_tag)
 
-# def split_urls_by_topic(df_tag_clean, number_topics):
+# def split_urls_by_topic(df_tag_clean, num_topics):
 #     return (
 #         df_tag_clean.loc[df_tag_clean['topic_id'] == str(num)]
-#         for num in number_topics
+#         for num in num_topics
 #         ) commented out but example of cleaner code but less easy to understand than below
 
 def split_urls_by_topic(df_tag_clean, num_topics):
     """Function to split datframe into n separate dfs filtered on topic_id"""
     urls_by_topic_filtered = [] #create empty list
-    for num in num_topics:
+    for num in range(1, num_topics + 1):
+        print(num)
+        num = str(num)
+        print(num)
         urls_by_topic_filtered += \
             df_tag_clean.loc[df_tag_clean['topic_id'] == str(num)]
     return urls_by_topic_filtered
@@ -113,6 +116,12 @@ if __name__ == '__main__':
 
     print("Cleaning tags")
     df_tag_clean = clean_tagged_urls(df_tag)
+
+    print(df_tag_clean.head(10))
+    
+    print("test")
+    test = df_tag_clean.loc[df_tag_clean['topic_id'] == '1']
+    print(test.head(10))
 
     print("Splitting by topic")
     urls_by_topic_filtered = split_urls_by_topic(df_tag_clean, num_topics = args.num_topics)

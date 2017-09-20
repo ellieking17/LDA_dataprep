@@ -107,14 +107,11 @@ if __name__ == '__main__':
     print("Cleaning tags")
     df_tag_clean = clean_tagged_urls(df_tag)
 
-    
-
     print("Splitting by topic")
     urls_by_topic_filtered = split_urls_by_topic(df_tag_clean, num_topics = args.num_topics)
 
     print("Merging to text file")
     urltext_by_topic = get_text_by_merging(urls_by_topic_filtered)
-
 
     print("Tidying up")
     tidy_urltext_by_topic = tidy_to_urltext(urltext_by_topic)

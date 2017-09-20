@@ -65,10 +65,8 @@ def split_urls_by_topic(df_tag_clean, num_topics):
     urls_by_topic_filtered = [] #create empty list
     for num in range(1, num_topics + 1):
         print(num)
-        num = str(num)
-        print(num)
         urls_by_topic_filtered += \
-            df_tag_clean.loc[df_tag_clean['topic_id'] == str(num)]
+            df_tag_clean[df_tag_clean.topic_id == str(num)]
     return urls_by_topic_filtered
 
     
@@ -120,7 +118,7 @@ if __name__ == '__main__':
     print(df_tag_clean.head(10))
     
     print("test")
-    test = df_tag_clean.loc[df_tag_clean['topic_id'] == '1']
+    test = df_tag_clean[df_tag_clean.topic_id == '1']
     print(test.head(10))
 
     print("Splitting by topic")

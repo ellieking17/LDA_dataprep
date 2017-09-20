@@ -10,7 +10,7 @@ This script takes the tagged url output from train_LDA, cleans it, joins it to t
 
 
 Example usage:
-python clean_lda_out.py --out_path ../DATA/education/clean_lda_output --taxonfile ../DATA/education/educ_link_taxonpath.csv --raw_lda ../DATA/education/raw_lda_output/educ_154tops_tags.csv
+python clean_lda_out.py --out_path ../DATA/education/clean_lda_output --taxonfile ../DATA/education/educ_link_taxonpath.csv --raw_lda ../DATA/education/raw_lda_tag_output/educ_154tops_tags.csv
 """  
 __author__ = "Ellie King"
 __copyright__ = "Government Digital Service, 20/09/2017"
@@ -42,16 +42,19 @@ def read_data(taxonfile, raw_lda):
     print(original.head(5))
     return(tags, original)
 
-# def clean_tagged_urls(df_tag):
-#     """function to clean the dataframe to result in url 
-#     topic_id cols"""
-#     #drop the leading parentheses
-#     df_tag['b'] = df_tag['b'].str.replace(r'\[\(', '') 
-#     # drop the columns containing topics of lower (or equal probability)
-#     df2_tag =  df_tag.drop(df_tag.columns[[2, 3, 4, 5, 6, 7]], axis=1)
-#     # name the remaining two columns
-#     df2_tag.columns = ['url', 'topic_id']
-#     return(df2_tag)
+def clean_tags(tags):
+    """function to clean the dataframe from weird parentheses"""
+    #drop the leading parentheses
+    nourls = tags.drop('url', axis=1) # don't mess with urls as these are used in merges
+    urls = tags['url']
+    tags2 = nourls.apply(lambda x: x.str.replace(r'\[', ''), axis=1)
+    tags3 = tags2.apply(lambda x: x.str.replace(r'\(', ''), axis=1)
+    tags4 = tags3.apply(lambda x: x.str.replace(r'\]', ''), axis=1)
+    tags5 = tags4.apply(lambda x: x.str.replace(r'\)', ''), axis=1)
+
+    cleaned = pd.merge(urls.to_frame(), tags5, left_index = True, right_index = True)
+
+    return(cleaned)
 
 # def get_text_by_merging(urls_by_topic_filtered):
 #     #merge on the index column to get text back from original url, text data
@@ -65,13 +68,7 @@ def read_data(taxonfile, raw_lda):
 
 
 
-# out_lda.columns = ['Link', 'topic1', 'p1', 'topic2', 'p2', 'topic3', 'p3']
-# out_lda['topic1'] = out_lda['topic1'].str.replace(r'\[\(', '')
-# out_lda['topic2'] = out_lda['topic2'].str.replace(r'\(', '')
-# out_lda['topic3'] = out_lda['topic3'].str.replace(r'\(', '')
 
-# out_lda['p3'] = out_lda['p3'].str.replace(r'\)\]', '')
-# out_lda['p1'] = out_lda['p1'].str.replace(r'\)', '')
 # out_lda['p1'] = out_lda['p1'].str.replace(r'\]', '')
 # out_lda['p2'] = out_lda['p2'].str.replace(r'\)\]', '')
 # out_lda['p2'] = out_lda['p2'].str.replace(r'\)', '')
@@ -107,3 +104,5 @@ if __name__ == '__main__':
         raw_lda = args.raw_taggedurls_filename,
         )
 
+cleaned_tags = clean_tags(tags)
+print(cleaned_tags.head(5))

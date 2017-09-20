@@ -87,12 +87,16 @@ def namecols_urltext(tidy_urltext_by_topic):
     """Function to keep only the url and text columns of the documents tagged with each topic"""
     for df in tidy_urltext_by_topic:
             df.columns = ['url', 'text'] #rename columns as they will be expected in train_LDA.py
+            print(df.shape)
     return(tidy_urltext_by_topic)
 
 def write_to_csvs(named_urltext_by_topic, out_path):
-    for df in named_urltext_by_topic:
+    for index, df in enumerate(named_urltext_by_topic):
+        print(str(index))
+        fname = "{}{}{}".format("topic", str(index), ".csv")
+        print(fname)
         df.to_csv(
-        os.path.join(out_path,r'df.csv'), index = False
+        os.path.join(out_path, fname), index = False
         )
 
 

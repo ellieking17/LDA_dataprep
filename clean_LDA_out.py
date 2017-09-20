@@ -36,7 +36,7 @@ parser.add_argument(
 
 def read_data(taxonfile, raw_lda):
     """Function to read in original data and tagged documents after LDA"""
-    tags = pd.read_csv(raw_lda, header=None, names=['url', 'topic1', 'p1', 'topic2', 'p2', 'topic3', 'p3'])
+    tags = pd.read_csv(raw_lda, header=None, names=['Link', 'topic1', 'p1', 'topic2', 'p2', 'topic3', 'p3'])
     print(tags.head(5))
     original = pd.read_csv(taxonfile)
     print(original.head(5))
@@ -45,36 +45,23 @@ def read_data(taxonfile, raw_lda):
 def clean_tags(tags):
     """function to clean the dataframe from weird parentheses"""
     #drop the leading parentheses
-    nourls = tags.drop('url', axis=1) # don't mess with urls as these are used in merges
-    urls = tags['url']
+    nourls = tags.drop('Link', axis=1) # don't mess with urls as these are used in merges
+    urls = tags['Link']
     tags2 = nourls.apply(lambda x: x.str.replace(r'\[', ''), axis=1)
     tags3 = tags2.apply(lambda x: x.str.replace(r'\(', ''), axis=1)
     tags4 = tags3.apply(lambda x: x.str.replace(r'\]', ''), axis=1)
     tags5 = tags4.apply(lambda x: x.str.replace(r'\)', ''), axis=1)
 
-    cleaned = pd.merge(urls.to_frame(), tags5, left_index = True, right_index = True)
+    cleaned_tags = pd.merge(urls.to_frame(), tags5, left_index = True, right_index = True)
 
-    return(cleaned)
+    return cleaned_tags
 
-# def get_text_by_merging(urls_by_topic_filtered):
-#     #merge on the index column to get text back from original url, text data
-#     urltext_by_topic = []
-#     for df in urls_by_topic_filtered:
-#         urltext_by_topic.append(pd.merge(df, df_preLDA, left_index = True, right_index = True , indicator = True))
-#     return urltext_by_topic
+def get_taxons_by_merging(cleaned_tags):
+    #merge on the Link column to get taxons (user research) in same frame as topics (LDA output)
+    both = pd.merge(cleaned_tags, original, how = 'inner', on = 'Link', indicator = True)
+    return both
 
 
-
-
-
-
-
-# out_lda['p1'] = out_lda['p1'].str.replace(r'\]', '')
-# out_lda['p2'] = out_lda['p2'].str.replace(r'\)\]', '')
-# out_lda['p2'] = out_lda['p2'].str.replace(r'\)', '')
-# out_lda.head()
-
-# both = pd.merge(out_lda, original, how = 'inner', on = 'Link', indicator = True)
 # both.head()
 # original.shape
 # out_lda.shape
@@ -92,7 +79,10 @@ def clean_tags(tags):
 # out_lda.shape
 # both.Link.nunique()
 
-# out_lda.to_csv('../DATA/education/educ_lda_out.csv', index = False)
+def save_tag_top(both, out_path):
+    """write to csv"""
+    both.to_csv(out_path, index = False)
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -106,3 +96,8 @@ if __name__ == '__main__':
 
 cleaned_tags = clean_tags(tags)
 print(cleaned_tags.head(5))
+
+taxon_tops = get_taxons_by_merging(cleaned_tags)
+print(taxon_tops.head(5))
+
+save_tag_top(taxon_tops, args.out_path)

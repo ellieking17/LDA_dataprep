@@ -6,11 +6,11 @@ import argparse
 import os
 
 """
-This script takes the tagged url output from train_LDA, cleans it, joins it to the original url TaxonPath data from govuk (which gives the user-research-generated taxons) and writes it to csv, where it will subsequently be read into R for performance metrics
+This script takes the tagged url output from train_LDA, cleans itand writes it to csv, where it will subsequently be read into R for performance metrics.  
 
 
 Example usage:
-python clean_lda_out.py --out_path ../DATA/education/clean_lda_output --taxonfile ../DATA/education/educ_link_taxonpath.csv --raw_lda ../DATA/education/raw_lda_tag_output/educ_154tops_tags.csv
+python clean_lda_out.py --out_path ../DATA/education/clean_lda_output/clean_154tops_educ.csv --taxonfile ../DATA/education/educ_link_taxonpath.csv --raw_lda ../DATA/education/raw_lda_tag_output/educ_154tops_tags.csv
 """  
 __author__ = "Ellie King"
 __copyright__ = "Government Digital Service, 20/09/2017"
@@ -58,14 +58,17 @@ def clean_tags(tags):
 
 def get_taxons_by_merging(cleaned_tags):
     #merge on the Link column to get taxons (user research) in same frame as topics (LDA output)
-    both = pd.merge(cleaned_tags, original, how = 'inner', on = 'Link', indicator = True)
+    both = pd.merge(cleaned_tags, original, how = 'outer', on = 'Link', indicator = True)
+    
+    print("shape of merged df is {}".format(both.shape))
+    print("shape of url, taxonpath data is {}".format(original.shape))
+    print("shape of url, topic 1-3, p1-3 data is {}".format(tags.shape))
+
+    print(pd.crosstab(index = both['_merge'], columns = 'count'))
     return both
 
 
-# both.head()
-# original.shape
-# out_lda.shape
-# both.shape
+# THIS MERGE EXPLORATION IS CONTINUED IN R performance_notebook_r.Rmd
 # pd.crosstab(index = both['_merge'], columns = 'count')
 # both = pd.merge(out_lda, original, how = 'left', on = 'Link', indicator = True)
 # both.shape
@@ -79,9 +82,9 @@ def get_taxons_by_merging(cleaned_tags):
 # out_lda.shape
 # both.Link.nunique()
 
-def save_tag_top(both, out_path):
+def save_tag_top(cleaned_tags, out_path):
     """write to csv"""
-    both.to_csv(out_path, index = False)
+    cleaned_tags.to_csv(out_path, index = False)
 
 
 if __name__ == '__main__':
@@ -97,7 +100,7 @@ if __name__ == '__main__':
 cleaned_tags = clean_tags(tags)
 print(cleaned_tags.head(5))
 
-taxon_tops = get_taxons_by_merging(cleaned_tags)
-print(taxon_tops.head(5))
+# taxon_tops = get_taxons_by_merging(cleaned_tags)
+# print(taxon_tops.head(5))
 
-save_tag_top(taxon_tops, args.out_path)
+save_tag_top(cleaned_tags, args.out_path)
